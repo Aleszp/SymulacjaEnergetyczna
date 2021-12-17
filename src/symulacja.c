@@ -1,3 +1,12 @@
+/******************************************************************************************************************************
+ * 
+ * Program symulujący zużycie energii przez mały zakład ceramiczny oraz liczący koszt energii elektrycznej w różnych taryfach.
+ * Autor: Aleksander Szpakiewicz-Szatan
+ * 17.12.2021
+ * 
+ ******************************************************************************************************************************/
+
+
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
@@ -5,12 +14,14 @@
 
 #include "symulacja.h"
 
+//Funkcja sadząca ziarno liczb losowych (by w głównej części programu nie trzeba było załączać STDLIB)
 void przygotuj()
 {
 	//srand(time(NULL));
 	srand(1);
 }
 
+//Liczba pseudolosowa o rozkładzie gaussa, m - wartość średnia, s - odchylenie standardowe
 double gauss(double m, double s) 
 { 
 	double x=(double)rand()/RAND_MAX; 
@@ -20,6 +31,7 @@ double gauss(double m, double s)
 	return s * z1 + m;
 }
 
+//Symulacja zużycia mocy dla czasu od tStart do tStop
 void segment(double tStart,double tStop,double Pamp,double PpiecStart,double PpiecStop,double* Pmax,double* Wx1,double* W12a,double* W12b,double* W22a,double* W22b,double* W23)
 {
 	const double tC12a[]={8.0, 11.0, 20.0, 21.0};
