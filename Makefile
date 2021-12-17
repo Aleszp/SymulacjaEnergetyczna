@@ -8,8 +8,8 @@ CXX=gcc
 CFLAGS=-pedantic -Wall -std=c11 -O3 -I$(INCLUDEDIR) 
 LIBS= -lm
 
-DEPS = 
-SRCS = symulacja.c
+DEPS = symulacja.h
+SRCS = main.c symulacja.c
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.c=.o))
 SRCS := $(addprefix $(SRCDIR),$(SRCS))
