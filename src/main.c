@@ -2,7 +2,7 @@
  * 
  * Program symulujący zużycie energii przez mały zakład ceramiczny oraz liczący koszt energii elektrycznej w różnych taryfach.
  * Autor: Aleksander Szpakiewicz-Szatan
- * 17.12.2021
+ * 09.01.2022
  * 
  ******************************************************************************************************************************/
 
