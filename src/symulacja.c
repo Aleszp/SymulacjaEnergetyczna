@@ -32,13 +32,31 @@ double gauss(double m, double s)
 }
 
 //Symulacja zużycia mocy dla czasu od tStart do tStop
-void segment(double tStart,double tStop,double Pamp,double PpiecStart,double PpiecStop,double* Pmax,double* Wx1,double* W12a,double* W12b,double* W22a,double* W22b,double* W23)
+void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,double PpiecStop,double* Pmax,double* Wx1,double* W12a,double* W12b,double* W22a,double* W22b,double* W23)
 {
-	const double tC12a[]={8.0, 11.0, 20.0, 21.0};
+	const double tC12a_z[]={8.0, 11.0, 17.0, 21.0};
+	const double tC12a_l[]={8.0, 11.0, 20.0, 21.0};
 	const double tC12b[]={6.0, 13.0, 15.0, 22.0};
-	const double tC22a[]={8.0, 11.0, 20.0, 21.0};
+	const double tC22a[12][4]=
+	{
+		{8.0, 11.0, 16.0, 21.0},
+		{8.0, 11.0, 16.0, 21.0},
+		{8.0, 11.0, 18.0, 21.0},
+		{8.0, 11.0, 19.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 19.0, 21.0},
+		{8.0, 11.0, 18.0, 21.0},
+		{8.0, 11.0, 16.0, 21.0}
+	};
+		
+		
 	const double tC22b[]={6.0, 21.0};
-	const double tC23[]={7.0, 13.0, 19.0, 22.0};
+	const double tC23_l[]={7.0, 13.0, 19.0, 22.0};
+	const double tC23_z[]={7.0, 13.0, 16.0, 21.0};
 	const double dt=1.0/60.0;
 	
 	double Wtmp=0.0;
@@ -54,29 +72,58 @@ void segment(double tStart,double tStop,double Pamp,double PpiecStart,double Ppi
 		Wtmp=dt*Ptmp;
 		
 		//C11,C21
-		(*Wx1)+=Wtmp;
+		Wx1[0]+=Wtmp;
+		if(Wtmp>40.0*dt)
+			Wx1[1]+=Wtmp-40.0*dt;
 		//C12a	
-		if((t>tC12a[0]&&t<=tC12a[1])||(t>tC12a[2]&&t<=tC12a[3]))
+		if(month>3&&month<9)	//lato
 		{
-			W12a[0]+=Wtmp;
+			if((t>tC12a_l[0]&&t<=tC12a_l[1])||(t>tC12a_l[2]&&t<=tC12a_l[3]))
+			{
+				W12a[0]+=Wtmp;
+				if(Wtmp>50.0*dt)
+					W12a[2]+=Wtmp-50.0*dt;
+			}
+			else
+			{
+				W12a[1]+=Wtmp;
+				if(Wtmp>40.0*dt)
+					W12a[3]+=Wtmp-40.0*dt;
+			}
 		}
-		else
+		else	//zima
 		{
-			W12a[1]+=Wtmp;
+			if((t>tC12a_z[0]&&t<=tC12a_z[1])||(t>tC12a_z[2]&&t<=tC12a_z[3]))
+			{
+				W12a[0]+=Wtmp;
+				if(Wtmp>50.0*dt)
+					W12a[2]+=Wtmp-50.0*dt;
+			}
+			else
+			{
+				W12a[1]+=Wtmp;
+				if(Wtmp>40.0*dt)
+					W12b[3]+=Wtmp-40.0*dt;
+			}
 		}
 		//C12b
 		if((t>tC12b[0]&&t<=tC12b[1])||(t>tC12b[2]&&t<=tC12b[3]))
 		{
 			W12b[0]+=Wtmp;
+			if(Wtmp>50.0*dt)
+				W12b[2]+=Wtmp-50.0*dt;
+			
 		}
 		else
 		{
 			W12b[1]+=Wtmp;
 		}
 		//C22a
-		if((t>tC22a[0]&&t<=tC22a[1])||(t>tC22a[2]&&t<=tC22a[3]))
+		if((t>tC22a[month][0]&&t<=tC22a[month][1])||(t>tC22a[month][2]&&t<=tC22a[month][3]))
 		{
 			W22a[0]+=Wtmp;
+			if(Wtmp>50.0*dt)
+				W22a[2]+=Wtmp-50.0*dt;
 		}
 		else
 		{
@@ -86,25 +133,57 @@ void segment(double tStart,double tStop,double Pamp,double PpiecStart,double Ppi
 		if(t>tC22b[0]&&t<=tC22b[1])
 		{
 			W22b[0]+=Wtmp;
+			if(Wtmp>50.0*dt)
+				W22b[2]+=Wtmp-50.0*dt;
 		}
 		else
 		{
 			W22b[1]+=Wtmp;
 		}
 		//C23
-		if((t>tC23[0]&&t<=tC23[1]))
+		//lato
+		if(month>3&&month<9)
 		{
-			W23[0]+=Wtmp;
-		}
-		else
-		{
-			if(t>tC23[2]&&t<=tC23[3])
+			if((t>tC23_l[0]&&t<=tC23_l[1]))
 			{
-				W23[1]+=Wtmp;
+				W23[0]+=Wtmp;
+				if(Wtmp>50.0*dt)
+					W23[3]+=Wtmp-50.0*dt;
 			}
 			else
 			{
-				W23[2]+=Wtmp;
+				if(t>tC23_l[2]&&t<=tC23_l[3])
+				{
+					W23[1]+=Wtmp;
+					if(Wtmp>50.0*dt)
+						W23[3]+=Wtmp-50.0*dt;
+				}
+				else
+				{
+					W23[2]+=Wtmp;
+				}
+			}
+		}
+		else	//zima
+		{
+			if((t>tC23_z[0]&&t<=tC23_z[1]))
+			{
+				W23[0]+=Wtmp;
+				if(Wtmp>50.0*dt)
+					W23[3]+=Wtmp-50.0*dt;
+			}
+			else
+			{
+				if(t>tC23_z[2]&&t<=tC23_z[3])
+				{
+					W23[1]+=Wtmp;
+					if(Wtmp>50.0*dt)
+						W23[4]+=Wtmp-50.0*dt;
+				}
+				else
+				{
+					W23[2]+=Wtmp;
+				}
 			}
 		}
 	}
