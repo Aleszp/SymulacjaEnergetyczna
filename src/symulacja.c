@@ -53,10 +53,11 @@ void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,
 		{8.0, 11.0, 16.0, 21.0}
 	};
 		
-		
+	const double szczytMocowy[]={7.0,22.0};
 	const double tC22b[]={6.0, 21.0};
 	const double tC23_l[]={7.0, 13.0, 19.0, 22.0};
 	const double tC23_z[]={7.0, 13.0, 16.0, 21.0};
+	
 	const double dt=1.0/60.0;
 	
 	double Wtmp=0.0;
@@ -75,6 +76,12 @@ void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,
 		Wx1[0]+=Wtmp;
 		if(Wtmp>40.0*dt)
 			Wx1[1]+=Wtmp-40.0*dt;
+		
+		if((t>szczytMocowy[0]&&t<=szczytMocowy[1]))
+		{
+			Wx1[2]+=Wtmp;
+		}	
+			
 		//C12a	
 		if(month>3&&month<9)	//lato
 		{
