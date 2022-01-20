@@ -110,7 +110,7 @@ void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,
 			{
 				W12a[1]+=Wtmp;
 				if(Wtmp>40.0*dt)
-					W12b[3]+=Wtmp-40.0*dt;
+					W12a[3]+=Wtmp-40.0*dt;
 			}
 		}
 		//C12b
@@ -118,12 +118,13 @@ void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,
 		{
 			W12b[0]+=Wtmp;
 			if(Wtmp>50.0*dt)
-				W12b[2]+=Wtmp-50.0*dt;
-			
+				W12b[2]+=Wtmp-50.0*dt;			
 		}
 		else
 		{
 			W12b[1]+=Wtmp;
+			if(Wtmp>40.0*dt)
+					W12b[3]+=Wtmp-40.0*dt;
 		}
 		//C22a
 		if((t>tC22a[month][0]&&t<=tC22a[month][1])||(t>tC22a[month][2]&&t<=tC22a[month][3]))
@@ -193,5 +194,201 @@ void segment(int month,double tStart,double tStop,double Pamp,double PpiecStart,
 				}
 			}
 		}
+	}
+}
+
+//Symulacja zużycia mocy dla czasu od tStart do tStop
+void segment2(int month,double tStart,double tStop,double Pamp,double PpiecStart,double PpiecStop,double* Pmax,double* Wx1,double* W12a,double* W12b,double* W22a,double* W22b,double* W23)
+{
+	const double tC12a_z[]={8.0, 11.0, 17.0, 21.0};
+	const double tC12a_l[]={8.0, 11.0, 20.0, 21.0};
+	const double tC12b[]={6.0, 13.0, 15.0, 22.0};
+	const double tC22a[12][4]=
+	{
+		{8.0, 11.0, 16.0, 21.0},
+		{8.0, 11.0, 16.0, 21.0},
+		{8.0, 11.0, 18.0, 21.0},
+		{8.0, 11.0, 19.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 20.0, 21.0},
+		{8.0, 11.0, 19.0, 21.0},
+		{8.0, 11.0, 18.0, 21.0},
+		{8.0, 11.0, 16.0, 21.0}
+	};
+		
+	const double szczytMocowy[]={7.0,22.0};
+	const double tC22b[]={6.0, 21.0};
+	const double tC23_l[]={7.0, 13.0, 19.0, 22.0};
+	const double tC23_z[]={7.0, 13.0, 16.0, 21.0};
+	
+	const double dt=1.0/60.0;
+	
+	double Wtmp=0.0;
+	double Ptmp=0.0;
+	double Ppiec=PpiecStart;
+	
+	
+	
+	for(double t=tStart;t<tStop;t+=dt)
+	{
+		Ppiec=PpiecStart+(PpiecStop-PpiecStart)*(t-tStart)/(tStop-tStart);
+		Ptmp=gauss(0.75*Pamp,0.25*Pamp)+Ppiec;
+		if(Ptmp>(*Pmax))
+			(*Pmax)=Ptmp;
+		Wtmp=Ptmp;
+		
+		//C11,C21
+		Wx1[0]=Wtmp;
+		if(Wtmp>40.0)
+			Wx1[1]=Wtmp-40.0;
+		else
+			Wx1[1]=0.0;
+		
+		if((t>szczytMocowy[0]&&t<=szczytMocowy[1]))
+		{
+			Wx1[2]=Wtmp;
+		}	
+			
+		//C12a	
+		if(month>3&&month<9)	//lato
+		{
+			if((t>tC12a_l[0]&&t<=tC12a_l[1])||(t>tC12a_l[2]&&t<=tC12a_l[3]))
+			{
+				W12a[0]=Wtmp;
+				W12a[1]=0.0;
+				if(Wtmp>50.0)
+					W12a[2]=Wtmp-50.0;
+				else
+					W12a[2]=0.0;
+				W12a[3]=0.0;
+			}
+			else
+			{
+				W12a[0]=0.0;
+				W12a[1]=Wtmp;
+				W12a[2]=0.0;
+				if(Wtmp>40.0)
+					W12a[3]=Wtmp-40.0;
+				else
+					W12a[3]=0.0;
+			}
+		}
+		else	//zima
+		{
+			if((t>tC12a_z[0]&&t<=tC12a_z[1])||(t>tC12a_z[2]&&t<=tC12a_z[3]))
+			{
+				W12a[0]=Wtmp;
+				W12a[1]=0.0;
+				if(Wtmp>50.0)
+					W12a[2]=Wtmp-50.0;
+				else
+					W12a[2]=0.0;
+				W12a[3]=0.0;
+			}
+			else
+			{
+				W12a[0]=0.0;
+				W12a[1]=Wtmp;
+				W12a[2]=0.0;
+				if(Wtmp>40.0)
+					W12a[3]=Wtmp-40.0;
+				else
+					W12a[3]=0.0;
+			}
+		}
+		//C12b
+		if((t>tC12b[0]&&t<=tC12b[1])||(t>tC12b[2]&&t<=tC12b[3]))
+		{
+			W12b[0]=Wtmp;
+			W12b[1]=0.0;
+			if(Wtmp>50.0)
+				W12b[2]=Wtmp-50.0;	
+			else
+				W12b[2]=0.0;			
+		}
+		else
+		{
+			W12b[0]=0.0;
+			W12b[1]=Wtmp;
+			if(Wtmp>40.0)
+				W12b[3]=Wtmp-40.0;
+			else
+				W12b[3]=0.0;
+		}
+		//C22a
+		if((t>tC22a[month][0]&&t<=tC22a[month][1])||(t>tC22a[month][2]&&t<=tC22a[month][3]))
+		{
+			W22a[0]=Wtmp;
+			if(Wtmp>50.0)
+				W22a[2]=Wtmp-50.0;
+			else
+				W22a[2]=0.0;
+		}
+		else
+		{
+			W22a[1]=Wtmp;
+		}
+		//C22b
+		if(t>tC22b[0]&&t<=tC22b[1])
+		{
+			W22b[0]=Wtmp;
+			if(Wtmp>50.0)
+				W22b[2]=Wtmp-50.0;
+		}
+		else
+		{
+			W22b[1]=Wtmp;
+		}
+		//C23
+		//lato
+		if(month>3&&month<9)
+		{
+			if((t>tC23_l[0]&&t<=tC23_l[1]))
+			{
+				W23[0]=Wtmp;
+				if(Wtmp>50.0)
+					W23[3]=Wtmp-50.0;
+			}
+			else
+			{
+				if(t>tC23_l[2]&&t<=tC23_l[3])
+				{
+					W23[1]=Wtmp;
+					if(Wtmp>50.0)
+						W23[3]=Wtmp-50.0;
+				}
+				else
+				{
+					W23[2]=Wtmp;
+				}
+			}
+		}
+		else	//zima
+		{
+			if((t>tC23_z[0]&&t<=tC23_z[1]))
+			{
+				W23[0]=Wtmp;
+				if(Wtmp>50.0)
+					W23[3]=Wtmp-50.0;
+			}
+			else
+			{
+				if(t>tC23_z[2]&&t<=tC23_z[3])
+				{
+					W23[1]=Wtmp;
+					if(Wtmp>50.0)
+						W23[4]=Wtmp-50.0;
+				}
+				else
+				{
+					W23[2]=Wtmp;
+				}
+			}
+		}
+		//fprintf(stderr,"godzina,Cx1,C11Ponad40kW,C12aSzczyt,C12aPozaszczyt,C12aPonad50kW,C12aPonad40kW,C12bSzczyt,C12bPozaszczyt,C12bPonad50kW,C12bPonad40kW,C22aSzczyt,C22aPozaszczyt,C22aPonad50kW,C22bSzczyt,C22bPozaszczyt,C22bPonad50kW,C23Szczyt1,C23Szczyt2,C23Pozaszczyt,C23Ponad50kW1,C23Ponad50kW2\n");
+		fprintf(stderr,"%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf,%0.4lf\n",t,Wx1[0],Wx1[1], W12a[0],W12a[1],W12a[2],W12a[3], W12b[0],W12b[1],W12b[2],W12a[3], W22a[0],W22a[1],W22a[2], W22b[0],W22b[1],W22b[2], W23[0],W23[1],W23[2],W23[3],W23[4]);	
 	}
 }
